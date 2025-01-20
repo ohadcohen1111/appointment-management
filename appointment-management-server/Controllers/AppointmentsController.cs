@@ -58,6 +58,8 @@ namespace AppointmentManagement.Controllers
                     .OrderBy(a => a.AppointmentTime)
                     .ToListAsync();
 
+                _logger.LogInformation("User {UserId} retrieved {AppointmentCount} appointments", userId, appointments.Count);
+
                 return Ok(appointments);
             }
             catch (Exception ex)
@@ -86,6 +88,8 @@ namespace AppointmentManagement.Controllers
 
                 var user = await _context.Users.FindAsync(userId);
 
+                _logger.LogInformation("User {UserId} successfully created appointment {AppointmentId}", userId, appointment.Id);
+
                 return Ok(new AppointmentDto
                 {
                     Id = appointment.Id,
@@ -111,13 +115,21 @@ namespace AppointmentManagement.Controllers
                 var appointment = await _context.Appointments.FindAsync(id);
 
                 if (appointment == null)
+                {
+                    _logger.LogWarning("User {UserId} attempted to update non-existent appointment {AppointmentId}", userId, id);
                     return NotFound();
+                }
 
                 if (appointment.UserId != userId)
+                {
+                    _logger.LogWarning("User {UserId} attempted to update appointment {AppointmentId} without permission", userId, id);
                     return Forbid();
+                }
 
                 appointment.AppointmentTime = updateDto.AppointmentTime;
                 await _context.SaveChangesAsync();
+
+                _logger.LogInformation("User {UserId} successfully updated appointment {AppointmentId}", userId, id);
 
                 return NoContent();
             }
@@ -149,7 +161,13 @@ namespace AppointmentManagement.Controllers
                     successParameter);
 
                 if (!(bool)successParameter.Value)
+                {
+                    _logger.LogWarning("User {UserId} failed to delete appointment {AppointmentId} - Not found or no permission",
+                        userId, id);
                     return NotFound();
+                }
+
+                _logger.LogInformation("User {UserId} successfully deleted appointment {AppointmentId}", userId, id);
 
                 return NoContent();
             }

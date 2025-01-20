@@ -37,10 +37,6 @@ td.time-column {
     color: #555;
 }
 
-td.actions-column .action-buttons {
-    justify-content: center;
-}
-
 .table-row:hover {
     background-color: #f8f9fa;
 }

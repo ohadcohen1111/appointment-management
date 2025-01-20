@@ -9,7 +9,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-// Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
@@ -21,15 +20,14 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Configure DbContext
+// configure db
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add services
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<PasswordService>();
 
-// Configure JWT
+// configure JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -47,7 +45,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 var app = builder.Build();
 
-// Configure middleware pipeline
+// configure middleware
 app.UseHttpsRedirection();
 app.UseCors();
 app.UseRouting();
